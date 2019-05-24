@@ -2,8 +2,11 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: log4j
+  labels:
+    app: log4j
 spec:
   containers:
     - name: log4j
       image: dockerregistryaks.azurecr.io/logging-demo
       imagePullPolicy: Always
+

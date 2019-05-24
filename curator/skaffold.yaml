@@ -1,0 +1,12 @@
+apiVersion: skaffold/v1beta10
+kind: Config
+build:
+  artifacts:
+  - image: dockerregistryaks.azurecr.io/curator
+  tagPolicy: 
+    envTemplate:  #   beta tags images with a configurable template string.
+      template: dockerregistryaks.azurecr.io/curator:latest
+deploy:
+  kubectl:
+    manifests:
+    - curator.yaml

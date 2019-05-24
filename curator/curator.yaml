@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curator
+  namespace: efk
+  labels:
+    app: curator
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: curator
+  template:
+    metadata:
+      labels:
+        app: curator
+    spec:
+      containers:
+        - name: curator
+          image: dockerregistryaks.azurecr.io/curator:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: INDEX_DELETION_AGE_IN_DAYS
+              value: "1"
+          volumeMounts:
+            - name: curator-configmap
+              mountPath: /tmp/
+      volumes:
+        - name: curator-configmap
+          configMap:
+            name: curator-configmap
+---
+apiVersion: v1
+data:
+  actions.yaml: |
+    actions:
+      1:
+        action: delete_indices
+        description: "Delete indices older than x days"
+        options:
+          continue_if_exception: False
+        filters:
+          - filtertype: age
+            source: creation_date
+            direction: older
+            unit: days
+            unit_count: ${INDEX_DELETION_AGE_IN_DAYS}
+  config.yaml: |
+    client:
+      hosts: [ "es-cluster-0.elasticsearch", "es-cluster-1.elasticsearch", "es-cluster-2.elasticsearch"]
+      port: 9200
+      url_prefix:
+      use_ssl: False
+      certificate:
+      client_cert:
+      client_key:
+      ssl_no_validate: False
+      http_auth:
+      timeout: 30
+      master_only: False
+
+    logging:
+      loglevel: INFO
+      logfile:
+      logformat: default
+      blacklist: ['elasticsearch', 'urllib3']
+kind: ConfigMap
+metadata:
+  name: curator-configmap
+  namespace: efk

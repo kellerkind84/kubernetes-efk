@@ -27,6 +27,20 @@ spec:
           volumeMounts:
             - name: curator-configmap
               mountPath: /tmp/
+          livenessProbe:
+            exec:
+              command:
+              - echo
+              - "curator live" 
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+              - echo
+              - "curator ready" 
+            initialDelaySeconds: 30
+            periodSeconds: 5
       volumes:
         - name: curator-configmap
           configMap:

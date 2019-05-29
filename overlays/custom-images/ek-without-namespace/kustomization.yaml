@@ -1,0 +1,6 @@
+patchesStrategicMerge:
+  - curator.yaml
+  - elasticsearch.yaml
+  - kibana.yaml
+bases:
+  - ../ek-without-namespace

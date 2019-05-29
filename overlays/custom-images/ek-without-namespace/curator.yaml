@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curator
+  namespace: efk
+  labels:
+    app: curator
+spec:
+  template:
+    spec:
+      containers:
+        - name: curator
+          image: dockerregistryaks.azurecr.io/curator:latest

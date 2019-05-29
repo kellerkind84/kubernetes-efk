@@ -1,0 +1,4 @@
+patchesStrategicMerge:
+  - fluentd.yaml
+bases:
+  - ../fluentd-for-admin

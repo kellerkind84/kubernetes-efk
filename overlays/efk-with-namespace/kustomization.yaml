@@ -3,3 +3,4 @@ bases:
   - ../../elasticsearch
   - ../../fluentd
   - ../../kibana
+  - ../../namespace

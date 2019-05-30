@@ -3,4 +3,4 @@ patchesStrategicMerge:
   - elasticsearch.yaml
   - kibana.yaml
 bases:
-  - ../ek-without-namespace
+  - ../../ek-without-namespace

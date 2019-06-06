@@ -62,6 +62,8 @@ data:
             timestring: '%Y.%m.%d'
             unit: days
             unit_count: ${INDEX_DELETION_AGE_IN_DAYS}
+          - filtertype: kibana
+            exclude: True
   config.yaml: |
     client:
       hosts: [ "es-cluster-0.elasticsearch", "es-cluster-1.elasticsearch", "es-cluster-2.elasticsearch"]

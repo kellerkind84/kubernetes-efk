@@ -1,50 +1,38 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1beta1
+kind: CronJob
 metadata:
   name: curator
-  namespace: efk
   labels:
     app: curator
 spec:
-  replicas: 1 
-  selector:
-    matchLabels:
-      app: curator
-  template:
-    metadata:
-      labels:
-        app: curator
+  schedule: "30 * * * *"
+  jobTemplate:
     spec:
-      containers:
-        - name: curator
-          image: dockerregistryaks.azurecr.io/curator:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 80
-          env:
-            - name: INDEX_DELETION_AGE_IN_DAYS
-              value: "1"
-          volumeMounts:
+      template:
+        spec:
+          serviceAccountName: curator
+          restartPolicy: OnFailure
+          containers:
+            - name: curator
+              image: dev.docker.repo.dev.icw.int/icw/curator:1.0-SNAPSHOT
+              imagePullPolicy: Always
+              args:
+                - curator
+                - --config
+                - /tmp/config.yaml
+                - /tmp/actions.yaml
+              ports:
+                - containerPort: 80
+              env:
+                - name: INDEX_DELETION_AGE_IN_DAYS
+                  value: "1"
+              volumeMounts:
+                - name: curator-configmap
+                  mountPath: /tmp/
+          volumes:
             - name: curator-configmap
-              mountPath: /tmp/
-          livenessProbe:
-            exec:
-              command:
-              - echo
-              - "curator live" 
-            initialDelaySeconds: 5
-            periodSeconds: 5
-          readinessProbe:
-            exec:
-              command:
-              - echo
-              - "curator ready" 
-            initialDelaySeconds: 30
-            periodSeconds: 5
-      volumes:
-        - name: curator-configmap
-          configMap:
-            name: curator-configmap
+              configMap:
+                name: curator-configmap
 ---
 apiVersion: v1
 data:
@@ -57,10 +45,13 @@ data:
           continue_if_exception: False
         filters:
           - filtertype: age
-            source: creation_date
+            source: name
             direction: older
+            timestring: '%Y.%m.%d'
             unit: days
             unit_count: ${INDEX_DELETION_AGE_IN_DAYS}
+          - filtertype: kibana
+            exclude: True
   config.yaml: |
     client:
       hosts: [ "es-cluster-0.elasticsearch", "es-cluster-1.elasticsearch", "es-cluster-2.elasticsearch"]
@@ -83,4 +74,4 @@ data:
 kind: ConfigMap
 metadata:
   name: curator-configmap
-  namespace: efk
+  namespace: icw-ehealth-suite-system

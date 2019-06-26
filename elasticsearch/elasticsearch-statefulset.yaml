@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: elasticsearch
-          image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.3
+          image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.2.0
           resources:
             limits:
               cpu: 1000m
@@ -43,6 +43,8 @@ spec:
               value: "es-cluster-0.elasticsearch,es-cluster-1.elasticsearch,es-cluster-2.elasticsearch"
             - name: discovery.zen.minimum_master_nodes
               value: "2"
+            - name: cluster.initial_master_nodes
+              value: es-cluster-0
             - name: ES_JAVA_OPTS
               value: "-Xms512m -Xmx512m"
       initContainers:
@@ -73,4 +75,4 @@ spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 1Gi
+            storage: 10Gi
